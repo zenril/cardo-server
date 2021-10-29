@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "Game" ALTER COLUMN "name" SET DEFAULT E'',
+ALTER COLUMN "open" SET DEFAULT true;
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "displayName" TEXT NOT NULL DEFAULT E'',
+ALTER COLUMN "email" SET DEFAULT E'',
+ALTER COLUMN "googleId" SET DEFAULT E'',
+ALTER COLUMN "name" SET DEFAULT E'';

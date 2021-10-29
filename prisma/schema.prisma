@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id   Int    @id @default(autoincrement())
+  name String @default("")
+
+  open  Boolean @default(true)
+  uuid  String? @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  users User[]
+  cards Card[]
+  stats Stats?
+
+  deck   Deck? @relation(fields: [deckId], references: [id])
+  deckId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([uuid, name, deckId], name: "Game.uuid_name_index_deckId")
+}
+
+model Stats {
+  id Int @id @default(autoincrement())
+
+  game   Game? @relation(fields: [gameId], references: [id])
+  gameId Int?  @unique
+
+  lastUser   User? @relation(fields: [lastUserId], references: [id])
+  lastUserId Int?  @unique
+
+  playedCards Int
+  totalCards  Int
+
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([updatedAt, gameId], name: "Stats.gameId_updatedAt")
+}
+
+model Deck {
+  id   Int     @id @default(autoincrement())
+  name String  @default("")
+  uuid String? @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  games Game[]
+  suits Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([uuid, name, userId], name: "Deck.uuid_name_userid_index")
+}
+
+model Card {
+  uuid     String? @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id       Int     @id @default(autoincrement())
+  name     String  @default("")
+  type     String  @default("")
+  set      String  @default("")
+  position Int     @default(0)
+
+  game   Game? @relation(fields: [gameId], references: [id])
+  gameId Int?
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  played      DateTime?
+  description String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([type, name, gameId, userId, uuid], name: "Card.type_name_gameid_userid_uuid_index")
+}
+
+model User {
+  id            Int     @id @default(autoincrement())
+  email         String  @unique @default("")
+  googleId      String  @default("")
+  name          String  @default("")
+  uuid          String? @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  displayName   String  @default("")
+  decks         Deck[]
+  games         Game[]
+  cards         Card[]
+  lastGameStats Stats?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([uuid], name: "User.uuid_index")
+}
+
+model Session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], name: "Session.IDX_session_expire")
+}
