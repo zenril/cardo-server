@@ -34,14 +34,19 @@ const app = express();
 const http = createServer(app);
 const io = new Server(http, {
   cors: {
-    origin: "http://localhost:4200",
-    methods: ["GET", "POST"],
+    origin: process.env.API!,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
 // io.to(['a']).emit('asd')
 
 configurePassport(passport);
-app.use(cors({ origin: ["http://localhost:4200"], credentials: true }));
+app.use(
+  cors({
+    origin: [process.env.API!],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
