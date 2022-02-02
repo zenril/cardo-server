@@ -30,13 +30,13 @@ const authRouter = () => {
     "/google/callback",
     passport.authenticate("google", { failureRedirect: "/" }),
     (req, res) => {
-      res.redirect(req.session.redirect || "http://localhost:4200/");
+      res.redirect(req.session.redirect || process.env.CLIENT!);
     }
   );
 
   router.get("/logout", (req, res) => {
     req.logout();
-    res.redirect("http://localhost:4200/");
+    res.redirect(process.env.CLIENT!);
   });
 
   router.get("/user", async (req: UserRequest, res) => {

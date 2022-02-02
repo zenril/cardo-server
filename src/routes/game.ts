@@ -186,7 +186,7 @@ const gameRouter = (io: Server) => {
       where: {
         uuid: req.params.game_uuid,
         users: {
-          every: {
+          some: {
             id: res.locals.user.id,
           },
         },
